@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Prompts — UAL</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#07000f;font-family:system-ui,sans-serif;min-height:100vh;padding:20px 16px 90px;}
+.page-header{margin-bottom:16px;}
+.page-header h1{font-size:20px;font-weight:900;color:#fff;}
+.page-header p{font-size:11px;color:#9b90b0;margin-top:2px;font-style:italic;}
+.stats-row{display:flex;gap:10px;margin-bottom:16px;}
+.stat-card{flex:1;background:#160028;border-radius:12px;padding:12px 8px;text-align:center;}
+.stat-val{font-size:1.5rem;font-weight:900;}
+.stat-lbl{font-size:10px;color:#9b90b0;margin-top:2px;}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;}
+.chip{flex-shrink:0;background:#160028;border:1px solid #2a1845;border-radius:20px;padding:6px 14px;font-size:12px;color:#9b90b0;cursor:pointer;white-space:nowrap;}
+.chip.active{background:linear-gradient(135deg,#7c3aed,#be185d);border-color:transparent;color:#fff;font-weight:700;}
+.part-header{border-radius:12px;padding:12px 16px;margin-bottom:8px;margin-top:4px;}
+.prompt-card{background:#160028;border:1px solid #2a1845;border-radius:12px;padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:border-color .2s;}
+.prompt-card:active{opacity:.85;}
+.prompt-card.responded{border-left:3px solid #34d399;}
+.prompt-card.favorited{border-left:3px solid #fbbf24;}
+.prompt-card.responded.favorited{border-left:3px solid #fbbf24;}
+.prompt-day{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
+.prompt-text{font-size:13px;color:#ede8f5;line-height:1.55;font-family:Georgia,serif;font-style:italic;}
+.prompt-meta{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap;}
+.badge{font-size:10px;font-weight:700;border-radius:99px;padding:2px 8px;}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;align-items:flex-end;justify-content:center;}
+.modal-bg.open{display:flex;}
+.modal{background:#160028;border-radius:20px 20px 0 0;padding:24px 20px 36px;width:100%;max-width:480px;border:1px solid #3d2060;max-height:92vh;overflow-y:auto;}
+.modal-day{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;}
+.modal-prompt{font-size:16px;color:#fff;font-style:italic;font-family:Georgia,serif;line-height:1.6;margin-bottom:16px;}
+.modal-textarea{width:100%;background:#0a0015;border:1px solid #2a1845;border-radius:10px;padding:12px;color:#ede8f5;font-size:13px;font-family:Georgia,serif;outline:none;resize:vertical;margin-bottom:12px;line-height:1.6;}
+.modal-actions{display:flex;gap:8px;margin-bottom:14px;}
+.fav-btn{background:#0a0015;border:1px solid #2a1845;border-radius:8px;color:#fbbf24;font-size:12px;padding:8px 14px;cursor:pointer;font-weight:700;}
+.fav-btn.active{background:rgba(251,191,36,.15);border-color:rgba(251,191,36,.5);}
+.modal-btns{display:flex;gap:10px;}
+.modal-save{flex:1;background:linear-gradient(135deg,#7c3aed,#be185d);border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:700;padding:12px;cursor:pointer;}
+.modal-cancel{background:#0a0015;border:1px solid #2a1845;border-radius:10px;color:#9b90b0;font-size:14px;padding:12px 18px;cursor:pointer;}
+.bot-nav{position:fixed;bottom:0;left:0;right:0;background:#0e0018;border-top:1px solid #2a1845;display:flex;z-index:100;max-width:480px;margin:0 auto;}
+.nav-btn{flex:1;padding:10px 4px 14px;border:none;background:none;font-size:10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;border-top:2px solid transparent;text-decoration:none;color:#5a5070;}
+.nav-btn.current{color:#c084fc;border-top-color:#c084fc;}
+.nav-icon{font-size:19px;}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#7c3aed;color:#fff;padding:10px 22px;border-radius:20px;font-size:14px;font-weight:700;z-index:999;pointer-events:none;opacity:0;transition:opacity .3s;}
+.toast.show{opacity:1;}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>✦ Prompts</h1>
+  <p>291 days · 4 parts · Every question the wound needs answered</p>
+</div>
+
+<div class="stats-row">
+  <div class="stat-card"><div class="stat-val" id="statResponded" style="color:#34d399;">0</div><div class="stat-lbl">Responded</div></div>
+  <div class="stat-card"><div class="stat-val" id="statFavorites" style="color:#fbbf24;">0</div><div class="stat-lbl">Favorites</div></div>
+  <div class="stat-card"><div class="stat-val" id="statRemaining" style="color:#c084fc;">291</div><div class="stat-lbl">Remaining</div></div>
+</div>
+
+<div class="chips">
+  <div class="chip active" onclick="setFilter('all',this)">All</div>
+  <div class="chip" onclick="setFilter('today',this)">Today</div>
+  <div class="chip" onclick="setFilter('past',this)">Past</div>
+  <div class="chip" onclick="setFilter('future',this)">Future</div>
+  <div class="chip" onclick="setFilter('responded',this)">Responded</div>
+  <div class="chip" onclick="setFilter('favorites',this)">Favorites</div>
+  <div class="chip" onclick="setFilter('unanswered',this)">Unanswered</div>
+</div>
+
+<div id="promptList"></div>
+
+<!-- PROMPT MODAL -->
+<div class="modal-bg" id="promptModal">
+  <div class="modal">
+    <div class="modal-day" id="modalDay"></div>
+    <div class="modal-prompt" id="modalPrompt"></div>
+    <div class="modal-actions">
+      <button class="fav-btn" id="favBtn" onclick="toggleFav()">☆ Favorite</button>
+      <div id="modalResponsedBadge" style="display:none;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3);border-radius:8px;padding:8px 14px;font-size:11px;color:#34d399;font-weight:700;">✅ Responded</div>
+    </div>
+    <textarea id="modalTextarea" class="modal-textarea" rows="8" placeholder="Write your response here. Let it be honest. Let it be yours."></textarea>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+      <button class="modal-save" onclick="saveResponse()">Save Response ✦</button>
+    </div>
+  </div>
+</div>
+
+<nav class="bot-nav">
+  <a href="https://fletch1980.github.io/Unworthy/" class="nav-btn"><span class="nav-icon">✦</span>Home</a>
+  <div class="nav-btn current"><span class="nav-icon">✦</span>Prompts</div>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var START=new Date('2026-03-15'), TOTAL=291;
+
+var PARTS=[
+  {name:'PART ONE: THE WOUND',sub:'How did it get inside me?',days:[1,84],accent:'#ec4899',bg:'rgba(190,24,93,.12)'},
+  {name:'PART TWO: THE DAMAGE',sub:'What did it cost me?',days:[85,182],accent:'#c084fc',bg:'rgba(124,58,237,.12)'},
+  {name:'PART THREE: THE TURNING',sub:'When did I start choosing myself?',days:[183,252],accent:'#34d399',bg:'rgba(52,211,153,.1)'},
+  {name:'PART FOUR: THE RECLAMATION',sub:'Who am I when I am free?',days:[253,291],accent:'#fbbf24',bg:'rgba(251,191,36,.08)'}
+];
+
+var PROMPTS=['When did I first learn that love had conditions?','What did I do to earn love as a child? Did it work?','Who taught me I was too much — or not enough?','What is the earliest memory I have of feeling unworthy?','What did I absorb from the women who raised me about love?','What did my father\'s absence or presence teach me about whether I was worth staying for?','When did I first make myself small to keep someone close?','What secret have I carried the longest without naming it?','When did I first run before someone could leave me?','What has this wound cost me that I\'ve never fully named out loud?','What did I believe about myself before I had language for it?','What am I afraid I\'ll find if I look all the way to the bottom of this?','When did I first decide that my fullness was dangerous?','What does the little girl who started this wound need me to say to her today?','What patterns do I keep repeating that trace back to the wound?','How have I abandoned my own work the way I was abandoned?','When did I confuse neediness for love? Intensity for intimacy?','What did I give away that I wish I had kept?','When did I stay long past the time I should have left?','When did I leave before something real could form?','How have I dimmed my gifts to make others comfortable?','Who manipulated me, and what did I ignore in order to stay?','When did I stop trusting my own perception? What happened?','What is the full cost — emotionally, creatively, spiritually — of this wound?','What have I never said out loud about the damage?','What would I say to the darkest version of myself if she were sitting across from me?','How did seeking validation online feed the wound instead of heal it?','When did performing strength cost me something I couldn\'t get back?','What does it feel like in my body when I\'m about to repeat the pattern?','What finally broke the pattern — even temporarily?','When did I first hear God in the quiet instead of the chaos?','What did I finish that I almost abandoned? How did it feel to finish?','When did I choose to stay with myself instead of running?','What does the wound feel like now compared to when I started?','When did I first trust my own instincts again?','What does it feel like to let someone actually see me?','What have I forgiven — or started to forgive?','Where do I still feel the wound? Is it smaller? Louder?','What have I learned that I cannot unlearn?','What does it mean that I am still here?','When did I choose the work over the wound for the first time?','What does staying with myself look like on an ordinary Tuesday?','What is God saying to me in the quiet this week?','What does it feel like to receive without immediately deflecting?','What does finishing this project prove about who I am now?','How has my relationship with my creativity changed this year?','What does it mean to love without losing myself?','What has genuine faith — not performance — looked like this year?','Who am I becoming that the wounded version of me couldn\'t imagine?','What am I teaching by surviving this?','What do I want to say to the wound at the end?','What would I want the girl in Letter 1 to know now?','What are the final words I want to leave on this year?','How do I live differently now than I did on March 15?','What does reclamation feel like in my body?','If I could write a letter to who I was a year ago, what would I say?','What does it mean that I did not abandon myself this time?'];
+
+// Expand PROMPTS to 291 by cycling
+var ALL_PROMPTS=[];
+for(var i=0;i<291;i++) ALL_PROMPTS.push(PROMPTS[i%PROMPTS.length]);
+
+function gd(k,fb){try{var v=localStorage.getItem(k);return v?JSON.parse(v):fb;}catch(e){return fb;}}
+function sd(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+function getData(){return gd('ual_prompts',{});}
+function setData(v){sd('ual_prompts',v);}
+function getDayNum(){return Math.max(1,Math.min(Math.floor((new Date()-START)/86400000)+1,TOTAL));}
+function getPartForDay(d){for(var i=0;i<PARTS.length;i++){if(d>=PARTS[i].days[0]&&d<=PARTS[i].days[1])return i;}return 0;}
+function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2200);}
+
+var currentFilter='all';
+var partOpen={};
+function togglePart(pi){partOpen[pi]=!partOpen[pi];renderList();}
+function setFilter(f,el){
+  currentFilter=f;
+  document.querySelectorAll('.chip').forEach(function(c){c.classList.remove('active');});
+  el.classList.add('active');
+  renderList();
+}
+
+function renderStats(){
+  var data=getData(),responded=0,favorites=0;
+  for(var k in data){if(data[k].response)responded++;if(data[k].fav)favorites++;}
+  document.getElementById('statResponded').textContent=responded;
+  document.getElementById('statFavorites').textContent=favorites;
+  document.getElementById('statRemaining').textContent=291-responded;
+}
+
+function renderList(){
+  var data=getData(), dn=getDayNum(), today=new Date();
+  var todayISO=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+
+  // Build filtered day list
+  var days=[];
+  for(var d=1;d<=291;d++){
+    var dayDate=new Date(START);dayDate.setDate(dayDate.getDate()+(d-1));
+    var iso=dayDate.getFullYear()+'-'+String(dayDate.getMonth()+1).padStart(2,'0')+'-'+String(dayDate.getDate()).padStart(2,'0');
+    var isPast=iso<todayISO, isToday=iso===todayISO, isFuture=iso>todayISO;
+    var entry=data[d]||{};
+    var show=false;
+    if(currentFilter==='all') show=true;
+    else if(currentFilter==='today') show=isToday;
+    else if(currentFilter==='past') show=isPast;
+    else if(currentFilter==='future') show=isFuture;
+    else if(currentFilter==='responded') show=!!entry.response;
+    else if(currentFilter==='favorites') show=!!entry.fav;
+    else if(currentFilter==='unanswered') show=!entry.response&&!isFuture;
+    if(show) days.push({d:d,iso:iso,isPast:isPast,isToday:isToday,isFuture:isFuture,entry:entry});
+  }
+
+  if(!days.length){
+    document.getElementById('promptList').innerHTML='<div style="text-align:center;color:#5a5070;font-size:13px;padding:30px 0;font-style:italic;">No prompts in this view.</div>';
+    return;
+  }
+
+  // Group by part
+  var grouped={};
+  days.forEach(function(item){
+    var pi=getPartForDay(item.d);
+    if(!grouped[pi]) grouped[pi]=[];
+    grouped[pi].push(item);
+  });
+
+  var html='';
+  Object.keys(grouped).sort(function(a,b){return a-b;}).forEach(function(pi){
+    var part=PARTS[pi], items=grouped[pi];
+    var data=getData();
+    var respondedCount=items.filter(function(item){return !!(data[item.d]&&data[item.d].response);}).length;
+    var isOpen=!!partOpen[pi];
+
+    html+='<div style="margin-bottom:8px;">'
+      +'<button onclick="togglePart('+pi+')" style="width:100%;display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:'+part.bg+';border:1px solid rgba(255,255,255,.08);border-left:4px solid '+part.accent+';border-radius:'+(isOpen?'12px 12px 0 0':'12px')+';cursor:pointer;text-align:left;">'
+        +'<div>'
+          +'<div style="font-size:13px;font-weight:800;color:'+part.accent+';">'+part.name+'</div>'
+          +'<div style="font-size:11px;color:#5a5070;margin-top:2px;">'+part.sub+' · '+respondedCount+'/'+items.length+' responded</div>'
+        +'</div>'
+        +'<div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.5);background:rgba(255,255,255,.08);border-radius:20px;padding:4px 10px;white-space:nowrap;">'+(isOpen?'▲ Hide':'▼ Show')+'</div>'
+      +'</button>'
+      +(isOpen
+        ?'<div style="background:#0a0018;border:1px solid rgba(255,255,255,.06);border-top:none;border-radius:0 0 12px 12px;padding:8px 10px;">'
+          +items.map(function(item){
+            var entry=data[item.d]||{};
+            var responded=!!entry.response, fav=!!entry.fav;
+            var borderClass=responded&&fav?'responded favorited':responded?'responded':fav?'favorited':'';
+            var dayLabel=item.isToday?'Day '+item.d+' · TODAY':item.isFuture?'Day '+item.d+' · Upcoming':'Day '+item.d;
+            var dayColor=item.isToday?part.accent:item.isFuture?'#3a3050':'#5a5070';
+            return '<div class="prompt-card '+borderClass+'" onclick="openModal('+item.d+')">'
+              +'<div class="prompt-day" style="color:'+dayColor+';">'+dayLabel+'</div>'
+              +'<div class="prompt-text">'+ALL_PROMPTS[item.d-1]+'</div>'
+              +'<div class="prompt-meta">'
+                +(responded?'<span class="badge" style="background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.3);">✅ Responded</span>':'')
+                +(fav?'<span class="badge" style="background:rgba(251,191,36,.1);color:#fbbf24;border:1px solid rgba(251,191,36,.3);">★ Favorite</span>':'')
+                +(entry.response?'<span style="font-size:11px;color:#5a5070;font-style:italic;">Tap to read or edit →</span>':'<span style="font-size:11px;color:#5a5070;">Tap to respond →</span>')
+              +'</div>'
+              +'</div>';
+          }).join('')
+          +'</div>'
+        :'')
+      +'</div>';
+  });
+
+  document.getElementById('promptList').innerHTML=html;
+}
+
+// MODAL
+var modalDay=0;
+function openModal(d){
+  modalDay=d;
+  var data=getData(), entry=data[d]||{};
+  var pi=getPartForDay(d);
+  var part=PARTS[pi];
+  var today=new Date();
+  var todayISO=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+  var dayDate=new Date(START);dayDate.setDate(dayDate.getDate()+(d-1));
+  var iso=dayDate.getFullYear()+'-'+String(dayDate.getMonth()+1).padStart(2,'0')+'-'+String(dayDate.getDate()).padStart(2,'0');
+  var isToday=iso===todayISO;
+
+  document.getElementById('modalDay').style.color=part.accent;
+  document.getElementById('modalDay').textContent=(isToday?'Day '+d+' · TODAY · ':('Day '+d+' · '))+part.name;
+  document.getElementById('modalPrompt').textContent='"'+ALL_PROMPTS[d-1]+'"';
+  document.getElementById('modalTextarea').value=entry.response||'';
+
+  var favBtn=document.getElementById('favBtn');
+  favBtn.textContent=entry.fav?'★ Favorited':'☆ Favorite';
+  favBtn.classList.toggle('active',!!entry.fav);
+
+  document.getElementById('modalResponsedBadge').style.display=entry.response?'block':'none';
+  document.getElementById('promptModal').classList.add('open');
+}
+
+function toggleFav(){
+  var data=getData();
+  if(!data[modalDay]) data[modalDay]={};
+  data[modalDay].fav=!data[modalDay].fav;
+  setData(data);
+  var fav=data[modalDay].fav;
+  var favBtn=document.getElementById('favBtn');
+  favBtn.textContent=fav?'★ Favorited':'☆ Favorite';
+  favBtn.classList.toggle('active',fav);
+  toast(fav?'Added to favorites ★':'Removed from favorites');
+}
+
+function saveResponse(){
+  var text=document.getElementById('modalTextarea').value.trim();
+  var data=getData();
+  if(!data[modalDay]) data[modalDay]={};
+  data[modalDay].response=text;
+  data[modalDay].updatedAt=new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  setData(data);
+  closeModal();
+  renderStats();
+  renderList();
+  toast('Response saved ✦');
+}
+
+function closeModal(){document.getElementById('promptModal').classList.remove('open');}
+document.getElementById('promptModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+
+renderStats();
+renderList();
+</script>
+</body>
+</html>
