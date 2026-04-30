@@ -17,7 +17,6 @@ body{background:#07000f;font-family:system-ui,sans-serif;min-height:100vh;paddin
 .chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;}
 .chip{flex-shrink:0;background:#160028;border:1px solid #2a1845;border-radius:20px;padding:6px 14px;font-size:12px;color:#9b90b0;cursor:pointer;white-space:nowrap;}
 .chip.active{background:linear-gradient(135deg,#7c3aed,#be185d);border-color:transparent;color:#fff;font-weight:700;}
-.part-header{border-radius:12px;padding:12px 16px;margin-bottom:8px;margin-top:4px;}
 .prompt-card{background:#160028;border:1px solid #2a1845;border-radius:12px;padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:border-color .2s;}
 .prompt-card:active{opacity:.85;}
 .prompt-card.responded{border-left:3px solid #34d399;}
@@ -77,6 +76,7 @@ body{background:#07000f;font-family:system-ui,sans-serif;min-height:100vh;paddin
   <div class="modal">
     <div class="modal-day" id="modalDay"></div>
     <div class="modal-prompt" id="modalPrompt"></div>
+    <div id="todaySourceNote" style="display:none;font-size:11px;color:#34d399;margin-bottom:10px;font-style:italic;">✅ Response pulled from Today's journal entry</div>
     <div class="modal-actions">
       <button class="fav-btn" id="favBtn" onclick="toggleFav()">☆ Favorite</button>
       <div id="modalResponsedBadge" style="display:none;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3);border-radius:8px;padding:8px 14px;font-size:11px;color:#34d399;font-weight:700;">✅ Responded</div>
@@ -97,7 +97,7 @@ body{background:#07000f;font-family:system-ui,sans-serif;min-height:100vh;paddin
 <div class="toast" id="toast"></div>
 
 <script>
-var START=new Date('2026-03-15'), TOTAL=291;
+var START=new Date('2026-04-27'), TOTAL=291;
 
 var PARTS=[
   {name:'PART ONE: THE WOUND',sub:'How did it get inside me?',days:[1,84],accent:'#ec4899',bg:'rgba(190,24,93,.12)'},
@@ -106,19 +106,40 @@ var PARTS=[
   {name:'PART FOUR: THE RECLAMATION',sub:'Who am I when I am free?',days:[253,291],accent:'#fbbf24',bg:'rgba(251,191,36,.08)'}
 ];
 
-var PROMPTS=['When did I first learn that love had conditions?','What did I do to earn love as a child? Did it work?','Who taught me I was too much — or not enough?','What is the earliest memory I have of feeling unworthy?','What did I absorb from the women who raised me about love?','What did my father\'s absence or presence teach me about whether I was worth staying for?','When did I first make myself small to keep someone close?','What secret have I carried the longest without naming it?','When did I first run before someone could leave me?','What has this wound cost me that I\'ve never fully named out loud?','What did I believe about myself before I had language for it?','What am I afraid I\'ll find if I look all the way to the bottom of this?','When did I first decide that my fullness was dangerous?','What does the little girl who started this wound need me to say to her today?','What patterns do I keep repeating that trace back to the wound?','How have I abandoned my own work the way I was abandoned?','When did I confuse neediness for love? Intensity for intimacy?','What did I give away that I wish I had kept?','When did I stay long past the time I should have left?','When did I leave before something real could form?','How have I dimmed my gifts to make others comfortable?','Who manipulated me, and what did I ignore in order to stay?','When did I stop trusting my own perception? What happened?','What is the full cost — emotionally, creatively, spiritually — of this wound?','What have I never said out loud about the damage?','What would I say to the darkest version of myself if she were sitting across from me?','How did seeking validation online feed the wound instead of heal it?','When did performing strength cost me something I couldn\'t get back?','What does it feel like in my body when I\'m about to repeat the pattern?','What finally broke the pattern — even temporarily?','When did I first hear God in the quiet instead of the chaos?','What did I finish that I almost abandoned? How did it feel to finish?','When did I choose to stay with myself instead of running?','What does the wound feel like now compared to when I started?','When did I first trust my own instincts again?','What does it feel like to let someone actually see me?','What have I forgiven — or started to forgive?','Where do I still feel the wound? Is it smaller? Louder?','What have I learned that I cannot unlearn?','What does it mean that I am still here?','When did I choose the work over the wound for the first time?','What does staying with myself look like on an ordinary Tuesday?','What is God saying to me in the quiet this week?','What does it feel like to receive without immediately deflecting?','What does finishing this project prove about who I am now?','How has my relationship with my creativity changed this year?','What does it mean to love without losing myself?','What has genuine faith — not performance — looked like this year?','Who am I becoming that the wounded version of me couldn\'t imagine?','What am I teaching by surviving this?','What do I want to say to the wound at the end?','What would I want the girl in Letter 1 to know now?','What are the final words I want to leave on this year?','How do I live differently now than I did on March 15?','What does reclamation feel like in my body?','If I could write a letter to who I was a year ago, what would I say?','What does it mean that I did not abandon myself this time?'];
+var PROMPTS=['When did I first learn that love had conditions?','What did I do to earn love as a child? Did it work?','Who taught me I was too much — or not enough?','What is the earliest memory I have of feeling unworthy?','What did I absorb from the women who raised me about love?','What did my father\'s absence or presence teach me about whether I was worth staying for?','When did I first make myself small to keep someone close?','What secret have I carried the longest without naming it?','When did I first run before someone could leave me?','What has this wound cost me that I\'ve never fully named out loud?','What did I believe about myself before I had language for it?','What am I afraid I\'ll find if I look all the way to the bottom of this?','When did I first decide that my fullness was dangerous?','What does the little girl who started this wound need me to say to her today?','What patterns do I keep repeating that trace back to the wound?','How have I abandoned my own work the way I was abandoned?','When did I confuse neediness for love? Intensity for intimacy?','What did I give away that I wish I had kept?','When did I stay long past the time I should have left?','When did I leave before something real could form?','How have I dimmed my gifts to make others comfortable?','Who manipulated me, and what did I ignore in order to stay?','When did I stop trusting my own perception? What happened?','What is the full cost — emotionally, creatively, spiritually — of this wound?','What have I never said out loud about the damage?','What would I say to the darkest version of myself if she were sitting across from me?','How did seeking validation online feed the wound instead of heal it?','When did performing strength cost me something I couldn\'t get back?','What does it feel like in my body when I\'m about to repeat the pattern?','What finally broke the pattern — even temporarily?','When did I first hear God in the quiet instead of the chaos?','What did I finish that I almost abandoned? How did it feel to finish?','When did I choose to stay with myself instead of running?','What does the wound feel like now compared to when I started?','When did I first trust my own instincts again?','What does it feel like to let someone actually see me?','What have I forgiven — or started to forgive?','Where do I still feel the wound? Is it smaller? Louder?','What have I learned that I cannot unlearn?','What does it mean that I am still here?','When did I choose the work over the wound for the first time?','What does staying with myself look like on an ordinary Tuesday?','What is God saying to me in the quiet this week?','What does it feel like to receive without immediately deflecting?','What does finishing this project prove about who I am now?','How has my relationship with my creativity changed this year?','What does it mean to love without losing myself?','What has genuine faith — not performance — looked like this year?','Who am I becoming that the wounded version of me couldn\'t imagine?','What am I teaching by surviving this?','What do I want to say to the wound at the end?','What would I want the girl in Letter 1 to know now?','What are the final words I want to leave on this year?','How do I live differently now than I did on April 27?','What does reclamation feel like in my body?','If I could write a letter to who I was a year ago, what would I say?','What does it mean that I did not abandon myself this time?'];
 
-// Expand PROMPTS to 291 by cycling
 var ALL_PROMPTS=[];
 for(var i=0;i<291;i++) ALL_PROMPTS.push(PROMPTS[i%PROMPTS.length]);
 
 function gd(k,fb){try{var v=localStorage.getItem(k);return v?JSON.parse(v):fb;}catch(e){return fb;}}
 function sd(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
-function getData(){return gd('ual_prompts',{});}
-function setData(v){sd('ual_prompts',v);}
+function getPromptData(){return gd('ual_prompts',{});}
+function setPromptData(v){sd('ual_prompts',v);}
+function getEntries(){return gd('ual_entries',{});}
 function getDayNum(){return Math.max(1,Math.min(Math.floor((new Date()-START)/86400000)+1,TOTAL));}
 function getPartForDay(d){for(var i=0;i<PARTS.length;i++){if(d>=PARTS[i].days[0]&&d<=PARTS[i].days[1])return i;}return 0;}
 function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2200);}
+
+// Get the ISO date for a given day number
+function isoForDay(d){
+  var dt=new Date(START);dt.setDate(dt.getDate()+(d-1));
+  return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');
+}
+
+// Get the best response for a day — checks ual_prompts first, then ual_entries
+function getResponseForDay(d){
+  var pd=getPromptData()[d]||{};
+  if(pd.response) return {response:pd.response,source:'prompts'};
+  var iso=isoForDay(d);
+  var entry=getEntries()[iso]||{};
+  if(entry.promptResponse) return {response:entry.promptResponse,source:'today'};
+  return {response:'',source:null};
+}
+
+// Check if a day has any response across both stores
+function hasResponse(d){
+  return !!getResponseForDay(d).response;
+}
 
 var currentFilter='all';
 var partOpen={};
@@ -131,33 +152,36 @@ function setFilter(f,el){
 }
 
 function renderStats(){
-  var data=getData(),responded=0,favorites=0;
-  for(var k in data){if(data[k].response)responded++;if(data[k].fav)favorites++;}
+  var responded=0,favorites=0,pd=getPromptData();
+  for(var d=1;d<=291;d++){
+    if(hasResponse(d)) responded++;
+    if(pd[d]&&pd[d].fav) favorites++;
+  }
   document.getElementById('statResponded').textContent=responded;
   document.getElementById('statFavorites').textContent=favorites;
   document.getElementById('statRemaining').textContent=291-responded;
 }
 
 function renderList(){
-  var data=getData(), dn=getDayNum(), today=new Date();
+  var pd=getPromptData();
+  var today=new Date();
   var todayISO=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
 
-  // Build filtered day list
   var days=[];
   for(var d=1;d<=291;d++){
-    var dayDate=new Date(START);dayDate.setDate(dayDate.getDate()+(d-1));
-    var iso=dayDate.getFullYear()+'-'+String(dayDate.getMonth()+1).padStart(2,'0')+'-'+String(dayDate.getDate()).padStart(2,'0');
-    var isPast=iso<todayISO, isToday=iso===todayISO, isFuture=iso>todayISO;
-    var entry=data[d]||{};
+    var iso=isoForDay(d);
+    var isPast=iso<todayISO,isToday=iso===todayISO,isFuture=iso>todayISO;
+    var responded=hasResponse(d);
+    var fav=!!(pd[d]&&pd[d].fav);
     var show=false;
     if(currentFilter==='all') show=true;
     else if(currentFilter==='today') show=isToday;
     else if(currentFilter==='past') show=isPast;
     else if(currentFilter==='future') show=isFuture;
-    else if(currentFilter==='responded') show=!!entry.response;
-    else if(currentFilter==='favorites') show=!!entry.fav;
-    else if(currentFilter==='unanswered') show=!entry.response&&!isFuture;
-    if(show) days.push({d:d,iso:iso,isPast:isPast,isToday:isToday,isFuture:isFuture,entry:entry});
+    else if(currentFilter==='responded') show=responded;
+    else if(currentFilter==='favorites') show=fav;
+    else if(currentFilter==='unanswered') show=!responded&&!isFuture;
+    if(show) days.push({d:d,iso:iso,isPast:isPast,isToday:isToday,isFuture:isFuture,responded:responded,fav:fav});
   }
 
   if(!days.length){
@@ -165,7 +189,6 @@ function renderList(){
     return;
   }
 
-  // Group by part
   var grouped={};
   days.forEach(function(item){
     var pi=getPartForDay(item.d);
@@ -175,9 +198,8 @@ function renderList(){
 
   var html='';
   Object.keys(grouped).sort(function(a,b){return a-b;}).forEach(function(pi){
-    var part=PARTS[pi], items=grouped[pi];
-    var data=getData();
-    var respondedCount=items.filter(function(item){return !!(data[item.d]&&data[item.d].response);}).length;
+    var part=PARTS[pi],items=grouped[pi];
+    var respondedCount=items.filter(function(x){return x.responded;}).length;
     var isOpen=!!partOpen[pi];
 
     html+='<div style="margin-bottom:8px;">'
@@ -191,18 +213,16 @@ function renderList(){
       +(isOpen
         ?'<div style="background:#0a0018;border:1px solid rgba(255,255,255,.06);border-top:none;border-radius:0 0 12px 12px;padding:8px 10px;">'
           +items.map(function(item){
-            var entry=data[item.d]||{};
-            var responded=!!entry.response, fav=!!entry.fav;
-            var borderClass=responded&&fav?'responded favorited':responded?'responded':fav?'favorited':'';
+            var borderClass=item.responded&&item.fav?'responded favorited':item.responded?'responded':item.fav?'favorited':'';
             var dayLabel=item.isToday?'Day '+item.d+' · TODAY':item.isFuture?'Day '+item.d+' · Upcoming':'Day '+item.d;
             var dayColor=item.isToday?part.accent:item.isFuture?'#3a3050':'#5a5070';
             return '<div class="prompt-card '+borderClass+'" onclick="openModal('+item.d+')">'
               +'<div class="prompt-day" style="color:'+dayColor+';">'+dayLabel+'</div>'
               +'<div class="prompt-text">'+ALL_PROMPTS[item.d-1]+'</div>'
               +'<div class="prompt-meta">'
-                +(responded?'<span class="badge" style="background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.3);">✅ Responded</span>':'')
-                +(fav?'<span class="badge" style="background:rgba(251,191,36,.1);color:#fbbf24;border:1px solid rgba(251,191,36,.3);">★ Favorite</span>':'')
-                +(entry.response?'<span style="font-size:11px;color:#5a5070;font-style:italic;">Tap to read or edit →</span>':'<span style="font-size:11px;color:#5a5070;">Tap to respond →</span>')
+                +(item.responded?'<span class="badge" style="background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.3);">✅ Responded</span>':'')
+                +(item.fav?'<span class="badge" style="background:rgba(251,191,36,.1);color:#fbbf24;border:1px solid rgba(251,191,36,.3);">★ Favorite</span>':'')
+                +(item.responded?'<span style="font-size:11px;color:#5a5070;font-style:italic;">Tap to read or edit →</span>':'<span style="font-size:11px;color:#5a5070;">Tap to respond →</span>')
               +'</div>'
               +'</div>';
           }).join('')
@@ -214,38 +234,38 @@ function renderList(){
   document.getElementById('promptList').innerHTML=html;
 }
 
-// MODAL
 var modalDay=0;
 function openModal(d){
   modalDay=d;
-  var data=getData(), entry=data[d]||{};
+  var pd=getPromptData(),entry=pd[d]||{};
   var pi=getPartForDay(d);
   var part=PARTS[pi];
-  var today=new Date();
-  var todayISO=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
-  var dayDate=new Date(START);dayDate.setDate(dayDate.getDate()+(d-1));
-  var iso=dayDate.getFullYear()+'-'+String(dayDate.getMonth()+1).padStart(2,'0')+'-'+String(dayDate.getDate()).padStart(2,'0');
+  var todayISO=new Date().toISOString().slice(0,10);
+  var iso=isoForDay(d);
   var isToday=iso===todayISO;
 
   document.getElementById('modalDay').style.color=part.accent;
   document.getElementById('modalDay').textContent=(isToday?'Day '+d+' · TODAY · ':('Day '+d+' · '))+part.name;
   document.getElementById('modalPrompt').textContent='"'+ALL_PROMPTS[d-1]+'"';
-  document.getElementById('modalTextarea').value=entry.response||'';
+
+  // Pull response from either store
+  var resp=getResponseForDay(d);
+  document.getElementById('modalTextarea').value=resp.response||'';
+  document.getElementById('todaySourceNote').style.display=resp.source==='today'?'block':'none';
 
   var favBtn=document.getElementById('favBtn');
   favBtn.textContent=entry.fav?'★ Favorited':'☆ Favorite';
   favBtn.classList.toggle('active',!!entry.fav);
-
-  document.getElementById('modalResponsedBadge').style.display=entry.response?'block':'none';
+  document.getElementById('modalResponsedBadge').style.display=resp.response?'block':'none';
   document.getElementById('promptModal').classList.add('open');
 }
 
 function toggleFav(){
-  var data=getData();
-  if(!data[modalDay]) data[modalDay]={};
-  data[modalDay].fav=!data[modalDay].fav;
-  setData(data);
-  var fav=data[modalDay].fav;
+  var pd=getPromptData();
+  if(!pd[modalDay]) pd[modalDay]={};
+  pd[modalDay].fav=!pd[modalDay].fav;
+  setPromptData(pd);
+  var fav=pd[modalDay].fav;
   var favBtn=document.getElementById('favBtn');
   favBtn.textContent=fav?'★ Favorited':'☆ Favorite';
   favBtn.classList.toggle('active',fav);
@@ -254,11 +274,31 @@ function toggleFav(){
 
 function saveResponse(){
   var text=document.getElementById('modalTextarea').value.trim();
-  var data=getData();
-  if(!data[modalDay]) data[modalDay]={};
-  data[modalDay].response=text;
-  data[modalDay].updatedAt=new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-  setData(data);
+  var date=new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+
+  // Save to ual_prompts
+  var pd=getPromptData();
+  if(!pd[modalDay]) pd[modalDay]={};
+  pd[modalDay].response=text;
+  pd[modalDay].updatedAt=date;
+  setPromptData(pd);
+
+  // Also sync to ual_entries for the corresponding date
+  var iso=isoForDay(modalDay);
+  var entries=getEntries();
+  if(!entries[iso]) entries[iso]={};
+  entries[iso].promptResponse=text;
+  entries[iso].prompt=ALL_PROMPTS[modalDay-1];
+  entries[iso].dayNum=modalDay;
+  if(!entries[iso].date) entries[iso].date=iso;
+  if(!entries[iso].savedAt) entries[iso].savedAt=new Date().toISOString();
+  sd('ual_entries',entries);
+
+  // Mark journal log
+  var logs=gd('ual_logs',{});
+  var acts=logs[iso]||[];
+  if(acts.indexOf('journal')===-1){acts.push('journal');logs[iso]=acts;sd('ual_logs',logs);}
+
   closeModal();
   renderStats();
   renderList();
