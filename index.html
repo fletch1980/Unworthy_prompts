@@ -71,7 +71,6 @@ body{background:#07000f;font-family:system-ui,sans-serif;min-height:100vh;paddin
 
 <div id="promptList"></div>
 
-<!-- PROMPT MODAL -->
 <div class="modal-bg" id="promptModal">
   <div class="modal">
     <div class="modal-day" id="modalDay"></div>
@@ -97,7 +96,7 @@ body{background:#07000f;font-family:system-ui,sans-serif;min-height:100vh;paddin
 <div class="toast" id="toast"></div>
 
 <script>
-var START=new Date(2026,3,27), TOTAL=291; // Month is 0-indexed: 3 = April
+var START=new Date(2026,4,18), TOTAL=291;
 
 var PARTS=[
   {name:'PART ONE: THE WOUND',sub:'How did it get inside me?',days:[1,84],accent:'#ec4899',bg:'rgba(190,24,93,.12)'},
@@ -106,27 +105,93 @@ var PARTS=[
   {name:'PART FOUR: THE RECLAMATION',sub:'Who am I when I am free?',days:[253,291],accent:'#fbbf24',bg:'rgba(251,191,36,.08)'}
 ];
 
-var PROMPTS=['When did I first learn that love had conditions?','What did I do to earn love as a child? Did it work?','Who taught me I was too much — or not enough?','What is the earliest memory I have of feeling unworthy?','What did I absorb from the women who raised me about love?','What did my father\'s absence or presence teach me about whether I was worth staying for?','When did I first make myself small to keep someone close?','What secret have I carried the longest without naming it?','When did I first run before someone could leave me?','What has this wound cost me that I\'ve never fully named out loud?','What did I believe about myself before I had language for it?','What am I afraid I\'ll find if I look all the way to the bottom of this?','When did I first decide that my fullness was dangerous?','What does the little girl who started this wound need me to say to her today?','What patterns do I keep repeating that trace back to the wound?','How have I abandoned my own work the way I was abandoned?','When did I confuse neediness for love? Intensity for intimacy?','What did I give away that I wish I had kept?','When did I stay long past the time I should have left?','When did I leave before something real could form?','How have I dimmed my gifts to make others comfortable?','Who manipulated me, and what did I ignore in order to stay?','When did I stop trusting my own perception? What happened?','What is the full cost — emotionally, creatively, spiritually — of this wound?','What have I never said out loud about the damage?','What would I say to the darkest version of myself if she were sitting across from me?','How did seeking validation online feed the wound instead of heal it?','When did performing strength cost me something I couldn\'t get back?','What does it feel like in my body when I\'m about to repeat the pattern?','What finally broke the pattern — even temporarily?','When did I first hear God in the quiet instead of the chaos?','What did I finish that I almost abandoned? How did it feel to finish?','When did I choose to stay with myself instead of running?','What does the wound feel like now compared to when I started?','When did I first trust my own instincts again?','What does it feel like to let someone actually see me?','What have I forgiven — or started to forgive?','Where do I still feel the wound? Is it smaller? Louder?','What have I learned that I cannot unlearn?','What does it mean that I am still here?','When did I choose the work over the wound for the first time?','What does staying with myself look like on an ordinary Tuesday?','What is God saying to me in the quiet this week?','What does it feel like to receive without immediately deflecting?','What does finishing this project prove about who I am now?','How has my relationship with my creativity changed this year?','What does it mean to love without losing myself?','What has genuine faith — not performance — looked like this year?','Who am I becoming that the wounded version of me couldn\'t imagine?','What am I teaching by surviving this?','What do I want to say to the wound at the end?','What would I want the girl in Letter 1 to know now?','What are the final words I want to leave on this year?','How do I live differently now than I did on May 4?','What does reclamation feel like in my body?','If I could write a letter to who I was a year ago, what would I say?','What does it mean that I did not abandon myself this time?'];
+var LETTER_PROMPTS=[
+  {days:[1,5],   prompts:['When did I first learn that love had conditions?','What is the earliest memory I have of feeling unworthy?','What did I believe about myself before I had language for it?','What am I afraid I\'ll find if I look all the way to the bottom of this?','What does the little girl who started this wound need me to say to her today?']},
+  {days:[6,12],  prompts:['What did I absorb from the women who raised me about love?','What did I do to earn love as a child? Did it work?','Who taught me I was too much — or not enough?','What did my mother\'s love teach me about whether I was worth staying for?','What did I inherit from the women in my family that I never asked for?','What would it have meant to be fully seen by the women who raised me?','What do I wish one of them had said to me?']},
+  {days:[13,19], prompts:['What did my father\'s absence or presence teach me about whether I was worth staying for?','When did I first understand that he wasn\'t coming back — or wasn\'t really there?','What did I do to try to make him stay or notice me?','What did his absence teach me to expect from men?','What would I say to him now if I could?','What did I need from him that I never got?','How did his leaving shape how I love?']},
+  {days:[20,26], prompts:['When did I first decide that my fullness was dangerous?','When did I first make myself small to keep someone close?','What did performing look like for me as a child?','What did I sacrifice to keep the peace at home?','When did I learn that being too much was a problem?','What would it have cost me to be fully myself as a child?','What version of myself did I hide — and from whom?']},
+  {days:[27,32], prompts:['How have I dimmed my gifts to make others comfortable?','When did I first make myself smaller to fit into a space that wasn\'t built for me?','What do I do in my body when I feel like too much?','Who have I made myself small for — and was it worth it?','What gifts did I bury because I was afraid of the reaction?','What would it feel like to take up my full space?']},
+  {days:[33,39], prompts:['When did I first run before someone could leave me?','What was the first time I remember love leaving?','What did I decide about myself the day that happened?','How did I protect myself from feeling that again?','What did I carry from that moment into every relationship after?','When did staying start to feel more dangerous than leaving?','What would I tell that girl now?']},
+  {days:[40,47], prompts:['What secret have I carried the longest without naming it?','What did the church teach me about my worth?','When did faith become a performance instead of a foundation?','What did I believe God thought of me at my lowest?','When did I start praying from shame instead of love?','What did I hide from God that I thought would disqualify me?','What would it mean to be loved by God exactly as I am?','When did I first feel safe enough to be honest with God?']},
+  {days:[48,54], prompts:['When did I confuse neediness for love? Intensity for intimacy?','When did I leave before something real could form?','What did chaos feel like compared to calm in a relationship?','Why did unavailable feel more like love than available?','What did I mistake for connection that wasn\'t?','When did I choose intensity over peace — and why?','What does real intimacy feel like compared to what I chased?']},
+  {days:[55,61], prompts:['What has this wound cost me that I\'ve never fully named out loud?','What is the secret I\'ve carried the longest?','Who did I protect by staying silent?','What would have happened if I had told the truth sooner?','What did keeping that secret cost my body?','Who deserved to know and didn\'t?','What does it feel like to name it now?']},
+  {days:[62,67], prompts:['What did I give away that I wish I had kept?','When did I first notice that other girls were chosen and I wasn\'t?','What story did I tell myself about why I was passed over?','How did watching others be loved change how I saw myself?','What did being overlooked teach me to expect?','When did I stop expecting to be chosen?']},
+  {days:[68,74], prompts:['What does it feel like in my body when I\'m about to repeat the pattern?','When did I stop trusting my own perception? What happened?','When did I sabotage something good because I was waiting for it to end?','What does the moment before I run feel like?','Who did I leave before they could leave me?','What would have happened if I had stayed?','What am I still running from?']},
+  {days:[75,81], prompts:['What is the full cost — emotionally, creatively, spiritually — of this wound?','What have I never said out loud about the damage?','What did I carry into adulthood that I never chose to carry?','What did broken look like for me — from the outside and from the inside?','What did I build my adult life on top of without dealing with?','What would my life have looked like if the wound had been healed earlier?','What does it mean that I made it here anyway?']},
+  {days:[82,84], prompts:['What patterns do I keep repeating that trace back to the wound?','What would I say to the wound if it were sitting across from me?','What does the wound need to hear from me before I move into the damage?']},
+  {days:[85,92],  prompts:['Who manipulated me, and what did I ignore in order to stay?','What did the men I chose have in common with my earliest wound?','When did I know it was wrong and stay anyway?','What did I hope he would become that he never became?','What did I give him that I needed for myself?','What did choosing him say about what I believed I deserved?','When did I first realize I had chosen my father again?','What would I tell a daughter who chose the same man?']},
+  {days:[93,99],  prompts:['How have I abandoned my own work the way I was abandoned?','What did I stop working on — and why?','What did finishing something feel like compared to leaving it?','When did my own dreams become less important than someone else\'s comfort?','What project did I abandon that I still grieve?','What was I afraid would happen if I finished?','What would it mean to finish something just for me?']},
+  {days:[100,106],prompts:['How did seeking validation online feed the wound instead of heal it?','What was I looking for in the responses of strangers?','When did the screen become easier than real connection?','What did likes and comments give me that I wasn\'t getting elsewhere?','What did I perform online that I hid in real life?','What did I expose that I should have protected?','What would I have needed instead of an audience?']},
+  {days:[107,114],prompts:['What did I give away that I wish I had kept?','When did I start disappearing inside that relationship?','What version of myself did I leave behind in that marriage?','What did I tell myself to stay?','When did I stop recognizing myself?','What did I lose that took years to find again?','What did that marriage teach me about who I was — and wasn\'t?','What do I forgive myself for about that time?']},
+  {days:[115,121],prompts:['When did I leave before something real could form?','What made unavailable feel safer than available?','What did the chase give me that presence never could?','When did I confuse longing for love?','What did I tell myself about why he couldn\'t love me back?','What would I have had to face if he had actually shown up?','What did chasing protect me from?']},
+  {days:[122,128],prompts:['When did performing strength cost me something I couldn\'t get back?','What did being strong protect me from feeling?','Who needed me to be strong so they didn\'t have to be?','What did I carry alone that I should have put down?','When did strength become armor instead of character?','What would it have cost me to fall apart in front of someone?','What does real strength feel like compared to performed strength?']},
+  {days:[129,136],prompts:['What did I give away that I wish I had kept?','When did my body become currency instead of home?','What was I trying to get by giving what I gave?','What did I disconnect from to survive that season?','What did I tell myself it meant when it meant something else?','What do I owe my body now?','What does it mean to come back to myself?','What would it have looked like to protect myself then?']},
+  {days:[137,143],prompts:['When did I stay long past the time I should have left?','What kept me there after I knew?','What did I hope would change that never changed?','What did staying cost me that leaving would have saved?','Who did I stay for that I should have left for myself?','What did I tell myself about why I couldn\'t go?','What finally made me leave — or what finally broke me enough to go?']},
+  {days:[144,149],prompts:['When did I leave before something real could form?','What was I running from when I left that one?','What did I miss by leaving when I did?','What did I call freedom that was actually fear?','What would have happened if I had stayed one more month?','What did I protect myself from by leaving — and what did I lose?']},
+  {days:[150,156],prompts:['How have I dimmed my gifts to make others comfortable?','When did I first hide what I could do?','Who did I make myself smaller for — and did they even notice?','What gift have I never fully used because I was afraid of it?','What does it feel like to let my work be seen?','When did I start apologizing for what I could do?','What would I create if I stopped being afraid of my own ability?']},
+  {days:[157,163],prompts:['Who manipulated me, and what did I ignore in order to stay?','What did counterfeit love feel like from the inside?','What were the signs I didn\'t let myself see?','What did I make myself believe to avoid the truth?','What did that relationship cost me that I\'m still paying for?','What does real love feel like compared to what I settled for?','What do I know now that I wish I had known then?']},
+  {days:[164,170],prompts:['When did I stop trusting my own perception? What happened?','What made me doubt what I knew?','When did someone else\'s version of reality replace my own?','What did I gaslight myself into believing?','What did my instincts tell me that I overrode?','When did I start asking everyone else what I should feel?','What does it feel like to trust myself again?']},
+  {days:[171,178],prompts:['What is the full cost — emotionally, creatively, spiritually — of this wound?','What have I never said out loud about the damage?','What was the darkest I have ever been?','What kept me here when I didn\'t want to stay?','What did that season take from me that I am still reclaiming?','What do I understand now about that time that I couldn\'t then?','What does surviving the darkest place mean about who I am?','What do I owe the version of me who made it through?']},
+  {days:[179,182],prompts:['What would I say to the wound about what it cost me?','What am I ready to stop carrying?','What does the damage look like laid out in the open?','What do I need to say before I can turn?']},
+  {days:[183,190],prompts:['When did I first hear God in the quiet instead of the chaos?','What did exhaustion finally make me stop and feel?','What broke open when I had nothing left to perform?','What did hitting the bottom teach me that the climb never could?','When did I stop being able to pretend?','What did God say to me in the silence I had been avoiding?','What became possible when I finally stopped running?','What did I find when I had nothing left to lose?']},
+  {days:[191,197],prompts:['What is God saying to me in the quiet this week?','When did I first hear a voice that wasn\'t fear or performance?','What did the still small voice say that I almost missed?','What do I hear when I stop filling the silence?','What has God been trying to tell me that I keep talking over?','When did prayer start feeling like conversation instead of performance?','What does God\'s voice feel like compared to the wound\'s voice?']},
+  {days:[198,203],prompts:['What did I finish that I almost abandoned? How did it feel to finish?','When did I pick the pen back up after putting it down?','What did returning to the work feel like after being away?','What did I have to say that I had been holding back?','What does the page give me that nothing else does?','When did writing become survival instead of just expression?']},
+  {days:[204,209],prompts:['When did I choose to stay with myself instead of running?','What does staying with myself look like on an ordinary Tuesday?','What does it feel like to be in my own company without distraction?','When did I stop needing to escape myself?','What did I find when I finally sat still?','What does it mean to be a safe place for myself?']},
+  {days:[210,215],prompts:['What does the wound feel like now compared to when I started?','What can I see now that I couldn\'t see before?','What does the wound look like from the outside versus the inside?','What did naming it change?','What do I understand about it now that I couldn\'t then?','What does it feel like to look at it without flinching?']},
+  {days:[216,221],prompts:['When did I first trust my own instincts again?','What did it feel like to stop chasing?','What did I find when I turned around and faced myself?','What did I have to grieve to stop running?','What does peace feel like compared to the chase?','When did I realize I was worth waiting for?']},
+  {days:[222,227],prompts:['What does it feel like to let someone actually see me?','What does it feel like to receive without immediately deflecting?','What happens in my body when someone tries to love me well?','What do I do when love feels safe?','What did I have to unlearn to receive?','When did I first believe someone could love the real me?']},
+  {days:[228,232],prompts:['When did I choose the work over the wound for the first time?','What did returning to my calling feel like?','What did I have to believe about myself to come back?','What did my calling do while I was gone?','What does the work ask of me that the wound never could?']},
+  {days:[233,237],prompts:['What have I forgiven — or started to forgive?','What does forgiving my mother free me from?','What did she give me that I have never acknowledged?','What did she do from her own wound that I can now see clearly?','What does forgiveness feel like in my body?']},
+  {days:[238,242],prompts:['Where do I still feel the wound? Is it smaller? Louder?','What does forgiving my father free me from?','What do I understand about his leaving now that I couldn\'t then?','What do I still carry from him that I need to put down?','What does it mean to forgive someone who never asked?']},
+  {days:[243,246],prompts:['What have I learned that I cannot unlearn?','When did I stop second-guessing myself?','What does my instinct feel like when I actually listen to it?','What have I trusted recently that turned out to be right?']},
+  {days:[247,249],prompts:['What does it mean that I am still here?','What does choosing the work over the wound look like in practice?','What does it feel like to create from wholeness instead of pain?']},
+  {days:[250,251],prompts:['What am I teaching by surviving this?','What does it feel like to let myself be proud without qualifying it?']},
+  {days:[252,252],prompts:['What does it feel like to watch the wound lose its grip?']},
+  {days:[253,256],prompts:['What does it feel like to receive without immediately deflecting?','What do I do when someone gives me something I actually need?','What does receiving say about what I believe I deserve?','What did I have to unlearn to let love in?']},
+  {days:[257,260],prompts:['What does finishing this project prove about who I am now?','What did finishing feel like?','What did I have to become to get here?','What does done feel like in my body?']},
+  {days:[261,263],prompts:['How has my relationship with my creativity changed this year?','What does creating from wholeness feel like?','What does my creativity ask of me now that it didn\'t before?']},
+  {days:[264,266],prompts:['What does it mean to love without losing myself?','What does loving from fullness feel like compared to loving from lack?','What do I keep now that I used to give away?']},
+  {days:[267,269],prompts:['What has genuine faith — not performance — looked like this year?','What does real faith feel like in my body?','What did I stop performing when I started actually believing?']},
+  {days:[270,272],prompts:['Who am I becoming that the wounded version of me couldn\'t imagine?','What does it feel like to see clearly and not override what I see?','What do I do now that I never would have done before?']},
+  {days:[273,275],prompts:['What does reclamation feel like in my body?','What does it mean to choose yourself in the place that tried to define you?','What does home mean now?']},
+  {days:[276,278],prompts:['What am I teaching by surviving this?','What does my story give to someone still in the middle of theirs?','What do I now know that I could not have learned any other way?']},
+  {days:[279,280],prompts:['What do I want to say to the wound at the end?','What does the camera see now that I used to hide from it?']},
+  {days:[281,282],prompts:['What would I want the girl in Letter 1 to know now?','What does my own depth feel like now compared to before?']},
+  {days:[283,284],prompts:['What are the final words I want to leave on this year?','What does peace with the women in my family feel like?']},
+  {days:[285,286],prompts:['How do I live differently now than I did on May 18?','What does believing I am worth loving feel like on an ordinary day?']},
+  {days:[287,288],prompts:['If I could write a letter to who I was a year ago, what would I say?','What does it mean that I did not abandon myself this time?']},
+  {days:[289,290],prompts:['What does it mean that I did not abandon myself this time?','What do I say to the wound at the end?']},
+  {days:[291,291],prompts:['What are the final words I want to leave on this year?']}
+];
 
-var ALL_PROMPTS=[];
-for(var i=0;i<291;i++) ALL_PROMPTS.push(PROMPTS[i%PROMPTS.length]);
+function getPromptForDay(dn){
+  for(var i=0;i<LETTER_PROMPTS.length;i++){
+    var lp=LETTER_PROMPTS[i];
+    if(dn>=lp.days[0]&&dn<=lp.days[1]){
+      return lp.prompts[(dn-lp.days[0])%lp.prompts.length];
+    }
+  }
+  return 'What is this day asking of me?';
+}
 
 function gd(k,fb){try{var v=localStorage.getItem(k);return v?JSON.parse(v):fb;}catch(e){return fb;}}
 function sd(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 function getPromptData(){return gd('ual_prompts',{});}
 function setPromptData(v){sd('ual_prompts',v);}
 function getEntries(){return gd('ual_entries',{});}
-function getDayNum(){return Math.max(1,Math.min(Math.floor((new Date()-START)/86400000)+1,TOTAL));}
+function getDayNum(){
+  var now=new Date();
+  var today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  return Math.max(1,Math.min(Math.floor((today-START)/86400000)+1,TOTAL));
+}
 function getPartForDay(d){for(var i=0;i<PARTS.length;i++){if(d>=PARTS[i].days[0]&&d<=PARTS[i].days[1])return i;}return 0;}
 function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2200);}
 
-// Get the ISO date for a given day number
 function isoForDay(d){
-  var dt=new Date(START);dt.setDate(dt.getDate()+(d-1));
+  var dt=new Date(START.getFullYear(),START.getMonth(),START.getDate()+d-1);
   return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');
 }
 
-// Get the best response for a day — checks ual_prompts first, then ual_entries
 function getResponseForDay(d){
   var pd=getPromptData()[d]||{};
   if(pd.response) return {response:pd.response,source:'prompts'};
@@ -136,10 +201,7 @@ function getResponseForDay(d){
   return {response:'',source:null};
 }
 
-// Check if a day has any response across both stores
-function hasResponse(d){
-  return !!getResponseForDay(d).response;
-}
+function hasResponse(d){return !!getResponseForDay(d).response;}
 
 var currentFilter='all';
 var partOpen={};
@@ -164,8 +226,8 @@ function renderStats(){
 
 function renderList(){
   var pd=getPromptData();
-  var today=new Date();
-  var todayISO=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+  var now=new Date();
+  var todayISO=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
 
   var days=[];
   for(var d=1;d<=291;d++){
@@ -218,7 +280,7 @@ function renderList(){
             var dayColor=item.isToday?part.accent:item.isFuture?'#3a3050':'#5a5070';
             return '<div class="prompt-card '+borderClass+'" onclick="openModal('+item.d+')">'
               +'<div class="prompt-day" style="color:'+dayColor+';">'+dayLabel+'</div>'
-              +'<div class="prompt-text">'+ALL_PROMPTS[item.d-1]+'</div>'
+              +'<div class="prompt-text">'+getPromptForDay(item.d)+'</div>'
               +'<div class="prompt-meta">'
                 +(item.responded?'<span class="badge" style="background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.3);">✅ Responded</span>':'')
                 +(item.fav?'<span class="badge" style="background:rgba(251,191,36,.1);color:#fbbf24;border:1px solid rgba(251,191,36,.3);">★ Favorite</span>':'')
@@ -240,15 +302,15 @@ function openModal(d){
   var pd=getPromptData(),entry=pd[d]||{};
   var pi=getPartForDay(d);
   var part=PARTS[pi];
-  var todayISO=new Date().toISOString().slice(0,10);
+  var now=new Date();
+  var todayISO=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
   var iso=isoForDay(d);
   var isToday=iso===todayISO;
 
   document.getElementById('modalDay').style.color=part.accent;
   document.getElementById('modalDay').textContent=(isToday?'Day '+d+' · TODAY · ':('Day '+d+' · '))+part.name;
-  document.getElementById('modalPrompt').textContent='"'+ALL_PROMPTS[d-1]+'"';
+  document.getElementById('modalPrompt').textContent='"'+getPromptForDay(d)+'"';
 
-  // Pull response from either store
   var resp=getResponseForDay(d);
   document.getElementById('modalTextarea').value=resp.response||'';
   document.getElementById('todaySourceNote').style.display=resp.source==='today'?'block':'none';
@@ -275,26 +337,22 @@ function toggleFav(){
 function saveResponse(){
   var text=document.getElementById('modalTextarea').value.trim();
   var date=new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-
-  // Save to ual_prompts
   var pd=getPromptData();
   if(!pd[modalDay]) pd[modalDay]={};
   pd[modalDay].response=text;
   pd[modalDay].updatedAt=date;
   setPromptData(pd);
 
-  // Also sync to ual_entries for the corresponding date
   var iso=isoForDay(modalDay);
   var entries=getEntries();
   if(!entries[iso]) entries[iso]={};
   entries[iso].promptResponse=text;
-  entries[iso].prompt=ALL_PROMPTS[modalDay-1];
+  entries[iso].prompt=getPromptForDay(modalDay);
   entries[iso].dayNum=modalDay;
   if(!entries[iso].date) entries[iso].date=iso;
   if(!entries[iso].savedAt) entries[iso].savedAt=new Date().toISOString();
   sd('ual_entries',entries);
 
-  // Mark journal log
   var logs=gd('ual_logs',{});
   var acts=logs[iso]||[];
   if(acts.indexOf('journal')===-1){acts.push('journal');logs[iso]=acts;sd('ual_logs',logs);}
